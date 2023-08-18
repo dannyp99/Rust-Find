@@ -11,8 +11,17 @@ fn main() {
     let search_term: String = args.get(2).unwrap().to_string();
     let temp: &String = &String::from("");
     let search_type: String = args.get(3).unwrap_or_else(|| temp).to_string();
+    if search_type != "dir" || search_type != "file" {
+        println!("Invalid search type, please provide arguments \"dir\" or \"file\"");
+        return;
+    }
     search(starting_dir, search_term, search_type);
 }
 
 fn search(starting_dir: String, search_term: String, search_type: String) -> () {
+    
+}
+
+fn get_children_dirs() -> Vec<String> {
+ return Vec::new();
 }
