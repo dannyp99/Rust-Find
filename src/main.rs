@@ -26,14 +26,15 @@ fn main() {
 }
 
 fn search(starting_dir: String, search_term: String, search_type: String) -> () {
-    //get the all items from the current dir
     let empty_str: &String = &String::from("");
-    let regex = Regex::new(&search_term).unwrap();
+    let regex_search_term: String = String::from("^") + search_term.as_str() + &String::from("$");
+    let regex = Regex::new(&regex_search_term).unwrap();
+
     for file in WalkDir::new(starting_dir).into_iter().filter_map(|file| file.ok()) {
         if (search_type == "file" || search_type == "f") && regex.is_match(file.file_name().to_str().unwrap_or_else(|| empty_str)) {
-            println!("Found the file: {}", file.path().display());
-        } else if search_type == "dir" || search_type == "d" {
-            println!("path of file: {}", file.path().display());
+            println!("Found matching File: {}", file.path().display());
+        } else if (search_type == "dir" || search_type == "d") && file.path().to_string_lossy().ends_with(&search_term) {
+            println!("Found matching directory: {}", file.path().to_str().unwrap());
         }
     }
 }
