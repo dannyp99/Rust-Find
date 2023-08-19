@@ -1,5 +1,5 @@
 [package]
-name = "rust-find"
+name = "search"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 regex = "1.4.2"
 walkdir = "2"
+clap = { version = "4.0", features = ["derive"] }
