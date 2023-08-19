@@ -27,7 +27,7 @@ fn main() {
 
 fn search(starting_dir: String, search_term: String, search_type: String) -> () {
     let empty_str: &String = &String::from("");
-    let regex_search_term: String = String::from("^") + search_term.as_str() + &String::from("$");
+    let regex_search_term: String = String::from("^") + search_term.as_str() + &String::from("$"); // Bound search by tearm by start and end
     let regex = Regex::new(&regex_search_term).unwrap();
 
     for file in WalkDir::new(starting_dir).into_iter().filter_map(|file| file.ok()) {
