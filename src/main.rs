@@ -1,6 +1,6 @@
 extern crate walkdir;
 
-use std::collections::HashSet;
+use std::{collections::HashSet, path::Path};
 
 use walkdir::WalkDir;
 use regex::Regex;
@@ -24,7 +24,7 @@ fn main() {
     let args: Search = Search::parse();
     let starting_dir: Option<String> = args.starting_path;
     let search_term: String = args.name; // Bound search by tearm by start and end
-    let search_type_copy = match args.search_type.clone() {
+    let search_type_copy: String = match args.search_type.clone() {
         Some(x) => x,
         None => String::from("")
     };
@@ -45,14 +45,14 @@ fn main() {
 fn search(starting_dir: String, search_term: String, search_type: String) -> () {
     let empty_str: &String = &String::from("");
     // Enforce ending if there is no wildcard match
-    let regex_search_term =  if search_term.chars().nth_back(0).eq(&Option::Some('*')) 
+    let regex_search_term: String = if search_term.chars().nth_back(0).eq(&Option::Some('*')) 
         { String::from("^") + search_term.as_str() }
         else { String::from("^") + search_term.as_str() + &String::from("$")};
-    let regex = Regex::new(&regex_search_term).unwrap();
+    let regex: Regex = Regex::new(&regex_search_term).unwrap();
     
     for file in WalkDir::new(starting_dir).max_open(4).into_iter().filter_map(|file| file.ok()) {
-        let file_path = file.path();
-        let file_name = file.file_name().to_str().unwrap_or_else(|| empty_str);
+        let file_path: &Path = file.path();
+        let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
         if search_type == "f" && file_path.is_file() && regex.is_match(file_name) {
             println!("Found matching File: {}", file_path.display());
         } else if file_path.is_dir() && file_path.to_str().unwrap().ends_with(&search_term) {
@@ -64,13 +64,13 @@ fn search(starting_dir: String, search_term: String, search_type: String) -> () 
 fn search_all_types(starting_dir: String, search_term: String) {
     let empty_str: &String = &String::from("");
     // Enforce ending if there is no wildcard match
-    let regex_search_term =  if search_term.chars().nth_back(0).eq(&Option::Some('*')) 
+    let regex_search_term: String = if search_term.chars().nth_back(0).eq(&Option::Some('*')) 
         { String::from("^") + search_term.as_str() }
         else { String::from("^") + search_term.as_str() + &String::from("$")};
-    let regex = Regex::new(&regex_search_term).unwrap();
-    for file in WalkDir::new(starting_dir).max_open(4).into_iter().filter_map(|file| file.ok()) {
-        let file_path = file.path();
-        let file_name = file.file_name().to_str().unwrap_or_else(|| empty_str);
+    let regex: Regex = Regex::new(&regex_search_term).unwrap();
+    for file in WalkDir::new(starting_dir).max_open(4).into_iter().filter_map(|file: Result<walkdir::DirEntry, walkdir::Error>| file.ok()) {
+        let file_path: &Path = file.path();
+        let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
         if file_path.is_file() && regex.is_match(file_name) {
             println!("Found matching File: {}", file_path.display());
         } else if file_path.is_dir() && file_path.to_str().unwrap().ends_with(&search_term) {
