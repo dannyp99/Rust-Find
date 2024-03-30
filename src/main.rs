@@ -8,7 +8,7 @@ use walkdir::WalkDir;
 
 /// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
-#[clap(author = "Danny Pires", version, about = "File and Directory Search")]
+#[clap(author = "Danny F. Pires", version, about = "File and Directory Search")]
 struct Search {
     /// The path to start the search default is .
     starting_path: Option<String>,
@@ -22,7 +22,7 @@ struct Search {
 
 fn string_to_regex(search_term: String) -> Regex {
     let regex_search_term: String = if search_term.contains('*') {
-        let replaced_search_term = search_term.replace("*", "(.*)*");
+        let replaced_search_term = search_term.replace("*", "(.*)");
         String::from("^") + replaced_search_term.as_str()
     } else {
         String::from("^") + search_term.as_str() + &String::from("$")
