@@ -40,17 +40,17 @@ fn search(starting_dir: String, search_term: String, search_type: String) -> () 
 
     for file in WalkDir::new(starting_dir)
         .max_open(4)
-        .into_iter()
-        .filter_map(|file| file.ok())
-    {
-        let file_path: &Path = file.path();
-        let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
-        if search_type == "f" && file_path.is_file() && regex.is_match(file_name) {
-            println!("Found matching File: {}", file_path.display());
-        } else if search_type == "d" && file_path.is_dir() && file_path.to_str().unwrap().ends_with(&dir_search_term) {
-            println!("Found matching directory: {}", file_path.display());
-        }
-    }
+            .into_iter()
+            .filter_map(|file| file.ok())
+            {
+                let file_path: &Path = file.path();
+                let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
+                if search_type == "f" && file_path.is_file() && regex.is_match(file_name) {
+                    println!("Found matching File: {}", file_path.display());
+                } else if search_type == "d" && file_path.is_dir() && file_path.to_str().unwrap().ends_with(&dir_search_term) {
+                    println!("Found matching directory: {}", file_path.display());
+                }
+            }
 }
 
 fn search_all_types(starting_dir: String, search_term: String) {
@@ -61,17 +61,17 @@ fn search_all_types(starting_dir: String, search_term: String) {
 
     for file in WalkDir::new(starting_dir)
         .max_open(4)
-        .into_iter()
-        .filter_map(|file| file.ok())
-    {
-        let file_path: &Path = file.path();
-        let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
-        if file_path.is_file() && regex.is_match(file_name) {
-            println!("Found matching File: {}", file_path.display());
-        } else if file_path.is_dir() && file_path.to_str().unwrap().ends_with(&dir_search_term) {
-            println!("Found matching directory: {}", file_path.display());
-        }
-    }
+            .into_iter()
+            .filter_map(|file| file.ok())
+            {
+                let file_path: &Path = file.path();
+                let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
+                if file_path.is_file() && regex.is_match(file_name) {
+                    println!("Found matching File: {}", file_path.display());
+                } else if file_path.is_dir() && file_path.to_str().unwrap().ends_with(&dir_search_term) {
+                    println!("Found matching directory: {}", file_path.display());
+                }
+            }
 }
 
 fn main() {
