@@ -18,6 +18,9 @@ struct Search {
     #[clap(long = "type")]
     /// The type of search
     search_type: Option<String>,
+    #[clap(long = "path-only", default_value_t = true)]
+    // Print path only
+    path_only: bool
 }
 
 fn string_to_regex(search_term: String) -> Regex {
@@ -35,30 +38,37 @@ fn search(starting_dir: String, search_term: String, search_type: String) -> () 
     let empty_str: &String = &String::from("");
     // Enforce ending if there is no wildcard match
     let regex: Regex = string_to_regex(search_term.clone());
+    if search_type == "f" {
+        for file in WalkDir::new(starting_dir)
+            .max_open(10)
+                .into_iter()
+                .filter_map(|file| file.ok().filter(|f| f.path().is_file()))
 
-    for file in WalkDir::new(starting_dir)
-        .max_open(10)
-            .into_iter()
-            .filter_map(|file| file.ok())
+                {
+                    let file_path: &Path = file.path();
+                    let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
+                    if regex.is_match(file_name) {
+                        println!("{}", file_path.display());
+                    }
+                }
 
-    {
-        let file_path: &Path = file.path();
-        let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
-        let match_str: String = if file_path.is_file() {
-            format!("Found matching File: {}", file_path.display())
-        } else {
-            format!("Found matching Directory: {}", file_path.display())
-        };
-        if search_type == "f" && file_path.is_file() && regex.is_match(file_name) {
-            println!("{}", match_str);
-        } else if search_type== "d" && file_path.is_dir() && regex.is_match(file_name) {
-            println!("{}", match_str);
-        }
+    } else {
+        for file in WalkDir::new(starting_dir)
+            .max_open(10)
+                .into_iter()
+                .filter_map(|file| file.ok().filter(|f| f.path().is_dir()))
+
+                {
+                    let file_path: &Path = file.path();
+                    let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
+                    if regex.is_match(file_name) {
+                        println!("{}", file_path.display());
+                    }
+                }
     }
 }
 
-
-fn search_all_types(starting_dir: String, search_term: String) {
+fn search_all_types(starting_dir: String, search_term: String, path_only: bool) {
     let empty_str: &String = &String::from("");
     // Enforce ending if there is no wildcard match
     let regex: Regex = string_to_regex(search_term.clone());
@@ -70,7 +80,9 @@ fn search_all_types(starting_dir: String, search_term: String) {
     {
         let file_path: &Path = file.path();
         let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
-        let match_str: String = if file_path.is_file() {
+        let match_str: String = if path_only {
+            file_path.display().to_string()
+        } else if file_path.is_file() {
             format!("Found matching File: {}", file_path.display())
         } else {
             format!("Found matching Directory: {}", file_path.display())
@@ -98,8 +110,8 @@ fn main() {
 
     match (starting_dir, search_term, args.search_type) {
         (Some(x), y, Some(z)) => search(x, y, z),
-        (Some(x), y, None) => search_all_types(x, y),
+        (Some(x), y, None) => search_all_types(x, y, args.path_only),
         (None, y, Some(z)) => search(String::from("."), y, z),
-        (None, y, None) => search_all_types(String::from("."), y),
+        (None, y, None) => search_all_types(String::from("."), y, args.path_only),
     }
 }

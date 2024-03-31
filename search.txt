@@ -1,23 +1,23 @@
-Found matching File: /home/danny/Downloads/neovim/nvim-linux64/share/nvim/runtime/compiler/rustc.vim
-Found matching File: /home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc
-Found matching File: /home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/man/man1/rustc.1
-Found matching File: /home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-attrs.html
-Found matching File: /home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-private.html
-Found matching File: /home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-allow-const-fn-unstable.html
-Found matching File: /home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/bin/rustc
-Found matching File: /home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/man/man1/rustc.1
-Found matching File: /home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-attrs.html
-Found matching File: /home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-private.html
-Found matching File: /home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-allow-const-fn-unstable.html
-Found matching File: /home/danny/.cargo/registry/src/github.com-1ecc6299db9ec823/indexmap-1.9.1/src/rustc.rs
-Found matching File: /home/danny/.cargo/registry/src/github.com-1ecc6299db9ec823/hashbrown-0.12.3/src/rustc_entry.rs
-Found matching File: /home/danny/.cargo/registry/index/github.com-1ecc6299db9ec823/.cache/ru/st/rustc_version
-Found matching File: /home/danny/.cargo/bin/rustc
-Found matching File: /usr/src/linux-headers-6.5.0-26-generic/include/generated/rustc_cfg
-Found matching File: /usr/src/linux-headers-6.5.0-25-generic/include/generated/rustc_cfg
-Found matching File: /usr/share/vim/vim82/compiler/rustc.vim
-Found matching File: /usr/share/nvim/runtime/compiler/rustc.vim
-Found matching File: /var/lib/flatpak/app/org.x.Warpinator/x86_64/stable/88a19aa9532188e0f9d3f46be776eecd5f20b4ec8b9e52505d57b68c7ec0bfca/files/lib/python3.11/site-packages/setuptools_rust/__pycache__/rustc_info.cpython-311.pyc
-Found matching File: /var/lib/flatpak/app/org.x.Warpinator/x86_64/stable/88a19aa9532188e0f9d3f46be776eecd5f20b4ec8b9e52505d57b68c7ec0bfca/files/lib/python3.11/site-packages/setuptools_rust/rustc_info.py
-Found matching File: /nix/store/y4s5p4i427v5kxi72z1al4mar6vh2vyg-nixpkgs/nixpkgs/pkgs/build-support/rust/rustc-wrapper/rustc-wrapper.sh
-Found matching File: /nix/store/y4s5p4i427v5kxi72z1al4mar6vh2vyg-nixpkgs/nixpkgs/pkgs/development/compilers/rust/rustc.nix
+/home/danny/Downloads/neovim/nvim-linux64/share/nvim/runtime/compiler/rustc.vim
+/home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc
+/home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/man/man1/rustc.1
+/home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-attrs.html
+/home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-private.html
+/home/danny/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-allow-const-fn-unstable.html
+/home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/bin/rustc
+/home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/man/man1/rustc.1
+/home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-attrs.html
+/home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-private.html
+/home/danny/.rustup/toolchains/nightly-2021-01-15-x86_64-unknown-linux-gnu/share/doc/rust/html/unstable-book/language-features/rustc-allow-const-fn-unstable.html
+/home/danny/.cargo/registry/src/github.com-1ecc6299db9ec823/indexmap-1.9.1/src/rustc.rs
+/home/danny/.cargo/registry/src/github.com-1ecc6299db9ec823/hashbrown-0.12.3/src/rustc_entry.rs
+/home/danny/.cargo/registry/index/github.com-1ecc6299db9ec823/.cache/ru/st/rustc_version
+/home/danny/.cargo/bin/rustc
+/usr/src/linux-headers-6.5.0-26-generic/include/generated/rustc_cfg
+/usr/src/linux-headers-6.5.0-25-generic/include/generated/rustc_cfg
+/usr/share/vim/vim82/compiler/rustc.vim
+/usr/share/nvim/runtime/compiler/rustc.vim
+/var/lib/flatpak/app/org.x.Warpinator/x86_64/stable/88a19aa9532188e0f9d3f46be776eecd5f20b4ec8b9e52505d57b68c7ec0bfca/files/lib/python3.11/site-packages/setuptools_rust/__pycache__/rustc_info.cpython-311.pyc
+/var/lib/flatpak/app/org.x.Warpinator/x86_64/stable/88a19aa9532188e0f9d3f46be776eecd5f20b4ec8b9e52505d57b68c7ec0bfca/files/lib/python3.11/site-packages/setuptools_rust/rustc_info.py
+/nix/store/y4s5p4i427v5kxi72z1al4mar6vh2vyg-nixpkgs/nixpkgs/pkgs/build-support/rust/rustc-wrapper/rustc-wrapper.sh
+/nix/store/y4s5p4i427v5kxi72z1al4mar6vh2vyg-nixpkgs/nixpkgs/pkgs/development/compilers/rust/rustc.nix
