@@ -4,13 +4,13 @@ use std::{collections::HashSet, path::Path};
 
 use clap::Parser;
 use regex::Regex;
-use walkdir::WalkDir;
+use walkdir::{IntoIter, WalkDir};
 
 /// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
 #[clap(author = "Danny F. Pires", version, about = "File and Directory Search")]
 struct Search {
-    /// The path to start the search default is .
+    /// The path to start the search default is "./"
     starting_path: Option<String>,
     #[clap(long)]
     /// The pattern to search for
@@ -19,8 +19,11 @@ struct Search {
     /// The type of search
     search_type: Option<String>,
     #[clap(long = "path-only", default_value_t = true)]
-    // Print path only
-    path_only: bool
+    /// Print path only
+    path_only: bool,
+    #[clap(long = "max-open")]
+    /// Max open paths, doesn't impact final results but tradesoff memory for speed
+    max_open: Option<usize>
 }
 
 fn string_to_regex(search_term: String) -> Regex {
@@ -35,10 +38,8 @@ fn string_to_regex(search_term: String) -> Regex {
 }
 
 
-fn search_file(starting_dir: String, regex: Regex) -> () {
-        for file in WalkDir::new(starting_dir)
-            .max_open(10)
-                .into_iter()
+fn search_file(walkdir_iter: IntoIter, regex: Regex) -> () {
+        for file in walkdir_iter
                 .filter_map(|file| file.ok().filter(|f| f.metadata().unwrap().is_file()))
                 {
                     let file_path: &Path = file.path();
@@ -49,10 +50,8 @@ fn search_file(starting_dir: String, regex: Regex) -> () {
                 }
 }
 
-fn search_dir(starting_dir: String, regex: Regex) -> () {
-    for file in WalkDir::new(starting_dir)
-        .max_open(10)
-            .into_iter()
+fn search_dir(walkdir_iter: IntoIter, regex: Regex) -> () {
+    for file in walkdir_iter
             .filter_map(|file| file.ok().filter(|f| f.metadata().unwrap().is_dir()))
             {
                 let file_path: &Path = file.path();
@@ -63,10 +62,8 @@ fn search_dir(starting_dir: String, regex: Regex) -> () {
             }
 }
 
-fn search_all_types(starting_dir: String, regex: Regex, path_only: bool) {
-    for file in WalkDir::new(starting_dir)
-        .max_open(10)
-            .into_iter()
+fn search_all_types(walkdir_iter: IntoIter, regex: Regex, path_only: bool) {
+    for file in walkdir_iter
             .filter_map(|file| file.ok())
     {
         let file_path: &Path = file.path();
@@ -93,7 +90,11 @@ fn main() {
     let search_term: String = args.name; // Bound search by tearm by start and end
     let search_type: String = match args.search_type {
         Some(x) => x,
-        None => String::from(""),
+        None    => String::from("")
+    };
+    let max_open: usize = match args.max_open {
+        Some(x) => x,
+        None => 1
     };
     let regex: Regex = string_to_regex(search_term);
     let valid_types: HashSet<String> =
@@ -103,9 +104,11 @@ fn main() {
         return;
     }
 
-    match (starting_dir, regex, search_type.as_str()) {
-        (x, y, "f") => search_file(x,y),
-        (x, y, "d") => search_dir(x,y),
-        (x, y, _) => search_all_types(x, y, args.path_only),
+    let walkdir_iter: IntoIter = WalkDir::new(starting_dir).max_open(max_open).into_iter();
+
+    match search_type.as_str() {
+        "f" => search_file(walkdir_iter,regex),
+        "d" => search_dir(walkdir_iter,regex),
+        _ => search_all_types(walkdir_iter, regex, args.path_only),
     }
 }
