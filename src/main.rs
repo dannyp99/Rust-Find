@@ -34,52 +34,43 @@ fn string_to_regex(search_term: String) -> Regex {
     return regex;
 }
 
-fn search(starting_dir: String, search_term: String, search_type: String) -> () {
-    let empty_str: &String = &String::from("");
-    // Enforce ending if there is no wildcard match
-    let regex: Regex = string_to_regex(search_term.clone());
-    if search_type == "f" {
+
+fn search_file(starting_dir: String, regex: Regex) -> () {
         for file in WalkDir::new(starting_dir)
             .max_open(10)
                 .into_iter()
-                .filter_map(|file| file.ok().filter(|f| f.path().is_file()))
-
+                .filter_map(|file| file.ok().filter(|f| f.metadata().unwrap().is_file()))
                 {
                     let file_path: &Path = file.path();
-                    let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
+                    let file_name: &str = file.file_name().to_str().unwrap_or("");
                     if regex.is_match(file_name) {
                         println!("{}", file_path.display());
                     }
                 }
-
-    } else {
-        for file in WalkDir::new(starting_dir)
-            .max_open(10)
-                .into_iter()
-                .filter_map(|file| file.ok().filter(|f| f.path().is_dir()))
-
-                {
-                    let file_path: &Path = file.path();
-                    let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
-                    if regex.is_match(file_name) {
-                        println!("{}", file_path.display());
-                    }
-                }
-    }
 }
 
-fn search_all_types(starting_dir: String, search_term: String, path_only: bool) {
-    let empty_str: &String = &String::from("");
-    // Enforce ending if there is no wildcard match
-    let regex: Regex = string_to_regex(search_term.clone());
+fn search_dir(starting_dir: String, regex: Regex) -> () {
+    for file in WalkDir::new(starting_dir)
+        .max_open(10)
+            .into_iter()
+            .filter_map(|file| file.ok().filter(|f| f.metadata().unwrap().is_dir()))
+            {
+                let file_path: &Path = file.path();
+                let file_name: &str = file.file_name().to_str().unwrap_or("");
+                if regex.is_match(file_name) {
+                    println!("{}", file_path.display());
+                }
+            }
+}
 
+fn search_all_types(starting_dir: String, regex: Regex, path_only: bool) {
     for file in WalkDir::new(starting_dir)
         .max_open(10)
             .into_iter()
             .filter_map(|file| file.ok())
     {
         let file_path: &Path = file.path();
-        let file_name: &str = file.file_name().to_str().unwrap_or_else(|| empty_str);
+        let file_name: &str = file.file_name().to_str().unwrap_or("");
         let match_str: String = if path_only {
             file_path.display().to_string()
         } else if file_path.is_file() {
@@ -95,23 +86,26 @@ fn search_all_types(starting_dir: String, search_term: String, path_only: bool) 
 
 fn main() {
     let args: Search = Search::parse();
-    let starting_dir: Option<String> = args.starting_path;
+    let starting_dir: String = match args.starting_path {
+        Some(x) => x,
+        None => String::from(".")
+    };
     let search_term: String = args.name; // Bound search by tearm by start and end
-    let search_type_copy: String = match args.search_type.clone() {
+    let search_type: String = match args.search_type {
         Some(x) => x,
         None => String::from(""),
     };
+    let regex: Regex = string_to_regex(search_term);
     let valid_types: HashSet<String> =
         HashSet::from([String::from("d"), String::from("f"), String::from("")]);
-    if !valid_types.contains(&search_type_copy) {
-        println!("-type: {}: unkown type", search_type_copy);
+    if !valid_types.contains(&search_type) {
+        println!("-type: {}: unkown type", search_type);
         return;
     }
 
-    match (starting_dir, search_term, args.search_type) {
-        (Some(x), y, Some(z)) => search(x, y, z),
-        (Some(x), y, None) => search_all_types(x, y, args.path_only),
-        (None, y, Some(z)) => search(String::from("."), y, z),
-        (None, y, None) => search_all_types(String::from("."), y, args.path_only),
+    match (starting_dir, regex, search_type.as_str()) {
+        (x, y, "f") => search_file(x,y),
+        (x, y, "d") => search_dir(x,y),
+        (x, y, _) => search_all_types(x, y, args.path_only),
     }
 }
