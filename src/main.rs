@@ -18,9 +18,6 @@ struct Search {
     #[clap(long = "type")]
     /// The type of search
     search_type: Option<String>,
-    #[clap(long = "path-only", default_value_t = true)]
-    /// Print path only
-    path_only: bool,
     #[clap(long = "max-open")]
     /// Max open paths, doesn't impact final results but tradesoff memory for speed
     max_open: Option<usize>
@@ -28,12 +25,13 @@ struct Search {
 
 fn string_to_regex(search_term: String) -> Regex {
     let regex_search_term: String = if search_term.contains('*') {
-        let replaced_search_term = search_term.replace("*", "(.*)");
-        String::from("^") + replaced_search_term.as_str()
+        let replaced_search_term = search_term.replace(".", r"\.").replace("*", "(.*)");
+        String::from("^") + replaced_search_term.as_str() + &String::from("$")
     } else {
         String::from("^") + search_term.as_str() + &String::from("$")
     };
     let regex = Regex::new(&regex_search_term).unwrap();
+    //println!("Regex search term: {}", regex_search_term);
     return regex;
 }
 
@@ -43,7 +41,7 @@ fn search_file(walkdir_iter: IntoIter, regex: Regex) -> () {
     {
         let file_path: &Path = file.path();
         let file_name: &str = file.file_name().to_str().unwrap_or("");
-        if file.path().is_file() && regex.is_match(file_name) {
+        if file.file_type().is_file() && regex.is_match(file_name) {
             println!("{}", file_path.display());
         }
     }
@@ -53,25 +51,18 @@ fn search_dir(walkdir_iter: IntoIter, regex: Regex) -> () {
     for file in walkdir_iter.filter_map(|file| file.ok()) {
         let file_path: &Path = file.path();
         let file_name: &str = file.file_name().to_str().unwrap_or("");
-        if file.path().is_dir() && regex.is_match(file_name) {
+        if file.file_type().is_dir() && regex.is_match(file_name) {
             println!("{}", file_path.display());
         }
     }
 }
 
-fn search_all_types(walkdir_iter: IntoIter, regex: Regex, path_only: bool) {
+fn search_all_types(walkdir_iter: IntoIter, regex: Regex) {
     for file in walkdir_iter.filter_map(|file| file.ok()) {
         let file_path: &Path = file.path();
         let file_name: &str = file.file_name().to_str().unwrap_or("");
-        let match_str: String = if path_only {
-            file_path.display().to_string()
-        } else if file_path.is_file() {
-            format!("Found matching File: {}", file_path.display())
-        } else {
-            format!("Found matching Directory: {}", file_path.display())
-        };
         if regex.is_match(file_name) {
-            println!("{}", match_str);
+            println!("{}", file_path.display());
         }
     }
 }
@@ -104,6 +95,6 @@ fn main() {
     match search_type.as_str() {
         "f" => search_file(walkdir_iter,regex),
         "d" => search_dir(walkdir_iter,regex),
-        _ => search_all_types(walkdir_iter, regex, args.path_only),
+        _ => search_all_types(walkdir_iter, regex),
     }
 }
