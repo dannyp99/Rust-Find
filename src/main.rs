@@ -1,6 +1,6 @@
 extern crate walkdir;
 
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 
 use clap::Parser;
 use regex::Regex;
@@ -83,12 +83,12 @@ fn main() {
         None => 1
     };
     let regex: Regex = string_to_regex(search_term);
-    let valid_types: HashSet<String> =
-        HashSet::from([String::from("d"), String::from("f"), String::from("")]);
-    if !valid_types.contains(&search_type) {
-        println!("-type: {}: unkown type", search_type);
-        return;
-    }
+//    let valid_types: HashSet<String> =
+//        HashSet::from([String::from("d"), String::from("f"), String::from("")]);
+//    if !valid_types.contains(&search_type) {
+//        println!("-type: {}: unkown type", search_type);
+//        return;
+//    }
 
     let walkdir_iter: IntoIter = WalkDir::new(starting_dir).max_open(max_open).into_iter();
 
