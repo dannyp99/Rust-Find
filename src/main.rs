@@ -39,24 +39,21 @@ fn string_to_regex(search_term: String) -> Regex {
 
 
 fn search_file(walkdir_iter: IntoIter, regex: Regex) -> () {
-    for file in walkdir_iter.filter_map(|file| file.ok()
-        .filter(|f| f.metadata().is_ok() && f.metadata().unwrap().is_file()))
+    for file in walkdir_iter.filter_map(|file| file.ok())
     {
         let file_path: &Path = file.path();
         let file_name: &str = file.file_name().to_str().unwrap_or("");
-        if regex.is_match(file_name) {
+        if file.path().is_file() && regex.is_match(file_name) {
             println!("{}", file_path.display());
         }
     }
 }
 
 fn search_dir(walkdir_iter: IntoIter, regex: Regex) -> () {
-    for file in walkdir_iter.filter_map(|file| file.ok()
-        .filter(|f| f.metadata().is_ok() && f.metadata().unwrap().is_dir()))
-    {
+    for file in walkdir_iter.filter_map(|file| file.ok()) {
         let file_path: &Path = file.path();
         let file_name: &str = file.file_name().to_str().unwrap_or("");
-        if regex.is_match(file_name) {
+        if file.path().is_dir() && regex.is_match(file_name) {
             println!("{}", file_path.display());
         }
     }
