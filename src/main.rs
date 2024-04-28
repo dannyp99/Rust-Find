@@ -42,34 +42,27 @@ fn string_to_regex(search_term: String) -> Regex {
     return regex;
 }
 
-fn search_file(walkdir_iter: Vec<Result<walkdir::DirEntry, walkdir::Error>>, regex: Regex) -> () {
-    for file in walkdir_iter.iter().filter_map(|file| file.as_ref().ok()) {
-        let file_path: &Path = file.path();
-        let file_name: &str = file.file_name().to_str().unwrap_or("");
-        if file.file_type().is_file() && regex.is_match(file_name) {
-            println!("{}", file_path.display());
-        }
+fn search_file(file: walkdir::DirEntry, regex: Regex) -> () {
+    let file_path: &Path = file.path();
+    let file_name: &str = file.file_name().to_str().unwrap_or("");
+    if file.file_type().is_file() && regex.is_match(file_name) {
+        println!("{}", file_path.display());
     }
 }
 
-fn search_dir(walkdir_iter: Vec<Result<walkdir::DirEntry, walkdir::Error>>, regex: Regex) -> () {
-    for file in walkdir_iter.iter().filter_map(|file| file.as_ref().ok()) {
-        let file_path: &Path = file.path();
-        let file_name: &str = file.file_name().to_str().unwrap_or("");
-        if file.file_type().is_dir() && regex.is_match(file_name) {
-            println!("{}", file_path.display());
-        }
+fn search_dir(file: walkdir::DirEntry, regex: Regex) -> () {
+    let file_path: &Path = file.path();
+    let file_name: &str = file.file_name().to_str().unwrap_or("");
+    if file.file_type().is_dir() && regex.is_match(file_name) {
+        println!("{}", file_path.display());
     }
 }
 
-fn search_all_types(walkdir_iter: Vec<Result<walkdir::DirEntry, walkdir::Error>>, regex: Regex) {
-    println!("Search all types");
-    for file in walkdir_iter.iter().filter_map(|file| file.as_ref().ok()) {
-        let file_path: &Path = file.path();
-        let file_name: &str = file.file_name().to_str().unwrap_or("");
-        if regex.is_match(file_name) {
-            println!("{}", file_path.display());
-        }
+fn search_all_types(file: walkdir::DirEntry, regex: Regex) {
+    let file_path: &Path = file.path();
+    let file_name: &str = file.file_name().to_str().unwrap_or("");
+    if regex.is_match(file_name) {
+        println!("{}", file_path.display());
     }
 }
 
@@ -84,37 +77,43 @@ fn main() {
         Some(x) => x,
         None => String::from(""),
     };
+    let func: &dyn Fn(walkdir::DirEntry, regex::Regex) -> () = match search_type.as_str() {
+        "f" => &search_file,
+        "d" => &search_dir,
+        _ => &search_all_types,
+    };
     let max_open: usize = match args.max_open {
         Some(x) => x,
         None => 1,
     };
     let exclude_string = args.excluded_paths.unwrap_or(String::from(""));
-    let exclude_list: Vec<&str> = exclude_string.split(",").collect::<Vec<&str>>();
-    println!("Exclude list: {:#?}", exclude_list);
+    let exclude_list: Vec<&str> = if exclude_string.is_empty() {
+        vec![]
+    } else {
+        exclude_string.split(",").collect::<Vec<&str>>()
+    };
     let regex: Regex = string_to_regex(search_term);
-    //    let valid_types: HashSet<String> =
-    //        HashSet::from([String::from("d"), String::from("f"), String::from("")]);
-    //    if !valid_types.contains(&search_type) {
-    //        println!("-type: {}: unkown type", search_type);
-    //        return;
-    //    }
-
-    let walkdir_iter: Vec<Result<walkdir::DirEntry, walkdir::Error>> = WalkDir::new(starting_dir)
-        .max_open(max_open)
-        .into_iter()
-        .filter_entry(|entry| {
-            for exclude_item in &exclude_list {
-                if entry.path().to_str().unwrap().contains(exclude_item) {
-                    return false;
+    if exclude_list.len() > 0 {
+        for file in WalkDir::new(&starting_dir)
+            .max_open(max_open)
+                .into_iter()
+                .filter_entry(|entry| {
+                    for exclude_item in &exclude_list {
+                        if entry.path().to_str().unwrap().contains(exclude_item) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+        .filter_map(|file| file.ok()) {
+            func(file, regex.clone());
+        }
+    } else {
+        for file in WalkDir::new(&starting_dir)
+            .max_open(max_open)
+                .into_iter()
+                .filter_map(|file| file.ok()) {
+                    func(file, regex.clone());
                 }
-            }
-            return true;
-        })
-        .collect::<Vec<_>>();
-    //let filtered_iter: walkdir::FilterEntry<IntoIter, FnMut(&walkdir::DirEntry) -> bool> =
-    match search_type.as_str() {
-        "f" => search_file(walkdir_iter, regex),
-        "d" => search_dir(walkdir_iter, regex),
-        _ => search_all_types(walkdir_iter, regex),
     }
 }
