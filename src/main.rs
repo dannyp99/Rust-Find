@@ -21,7 +21,7 @@ struct Search {
     /// The type of search
     search_type: Option<String>,
     #[clap(long = "max-open")]
-    /// Max open paths, doesn't impact final results but tradesoff memory for speed
+    /// Max open paths, doesn't impact final results but tradesoff memory for speed default = 3
     max_open: Option<usize>,
     #[clap(long = "exclude")]
     /// Paths you which to exclude can be set as a comma separated list
@@ -74,7 +74,7 @@ fn main() {
     };
     let max_open: usize = match args.max_open {
         Some(x) => x,
-        None => 1,
+        None => 3,
     };
     let exclude_string = args.excluded_paths.unwrap_or(empty_str.clone());
     let regex: Regex = string_to_regex(search_term);
