@@ -1,7 +1,5 @@
 extern crate walkdir;
 
-use std::path::Path;
-
 use clap::Parser;
 use regex::Regex;
 use walkdir::WalkDir;
@@ -43,40 +41,32 @@ fn string_to_regex(search_term: String) -> Regex {
 }
 
 fn search_file(file: walkdir::DirEntry, regex: Regex) -> () {
-    let file_path: &Path = file.path();
-    let file_name: &str = file.file_name().to_str().unwrap_or("");
-    if file.file_type().is_file() && regex.is_match(file_name) {
-        println!("{}", file_path.display());
+    if file.file_type().is_file() && regex.is_match(file.file_name().to_str().unwrap_or("")) {
+        println!("{}", file.path().display());
     }
 }
 
 fn search_dir(file: walkdir::DirEntry, regex: Regex) -> () {
-    let file_path: &Path = file.path();
-    let file_name: &str = file.file_name().to_str().unwrap_or("");
-    if file.file_type().is_dir() && regex.is_match(file_name) {
-        println!("{}", file_path.display());
+    if file.file_type().is_dir() && regex.is_match(file.file_name().to_str().unwrap_or("")) {
+        println!("{}", file.path().display());
     }
 }
 
 fn search_all_types(file: walkdir::DirEntry, regex: Regex) {
-    let file_path: &Path = file.path();
-    let file_name: &str = file.file_name().to_str().unwrap_or("");
-    if regex.is_match(file_name) {
-        println!("{}", file_path.display());
+    if regex.is_match(file.file_name().to_str().unwrap_or("")) {
+        println!("{}", file.path().display());
     }
 }
 
 fn main() {
     let args: Search = Search::parse();
+    let empty_str: String = String::from("");
     let starting_dir: String = match args.starting_path {
         Some(x) => x,
         None => String::from("."),
     };
     let search_term: String = args.name; // Bound search by tearm by start and end
-    let search_type: String = match args.search_type {
-        Some(x) => x,
-        None => String::from(""),
-    };
+    let search_type: String = args.search_type.unwrap_or(empty_str.clone());
     let func: &dyn Fn(walkdir::DirEntry, regex::Regex) -> () = match search_type.as_str() {
         "f" => &search_file,
         "d" => &search_dir,
@@ -86,34 +76,33 @@ fn main() {
         Some(x) => x,
         None => 1,
     };
-    let exclude_string = args.excluded_paths.unwrap_or(String::from(""));
-    let exclude_list: Vec<&str> = if exclude_string.is_empty() {
-        vec![]
-    } else {
-        exclude_string.split(",").collect::<Vec<&str>>()
-    };
+    let exclude_string = args.excluded_paths.unwrap_or(empty_str.clone());
     let regex: Regex = string_to_regex(search_term);
-    if exclude_list.len() > 0 {
+    if exclude_string.is_empty() {
         for file in WalkDir::new(&starting_dir)
             .max_open(max_open)
-                .into_iter()
-                .filter_entry(|entry| {
-                    for exclude_item in &exclude_list {
-                        if entry.path().to_str().unwrap().contains(exclude_item) {
-                            return false;
-                        }
-                    }
-                    return true;
-                })
-        .filter_map(|file| file.ok()) {
+            .into_iter()
+            .filter_map(|file| file.ok())
+        {
             func(file, regex.clone());
         }
     } else {
+        let exclude_list: Vec<&str> = exclude_string.split(",").collect::<Vec<&str>>();
         for file in WalkDir::new(&starting_dir)
             .max_open(max_open)
-                .into_iter()
-                .filter_map(|file| file.ok()) {
-                    func(file, regex.clone());
+            .into_iter()
+            .filter_entry(|entry| {
+                for exclude_item in &exclude_list {
+                    if entry.path().starts_with(exclude_item) {
+                        return false;
+                    }
                 }
+                return true;
+            })
+        {
+            if file.is_ok() {
+                func(file.unwrap(), regex.clone());
+            }
+        }
     }
 }
