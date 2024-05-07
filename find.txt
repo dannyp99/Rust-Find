@@ -1,0 +1,2 @@
+/opt/neovim/.deps/build/src/treesitter/cli/src/main.rs
+/opt/alacritty/alacritty/src/main.rs
