@@ -28,7 +28,7 @@ struct Search {
     excluded_paths: Option<String>,
 }
 
-fn string_to_regex(search_term: String) -> Regex {
+fn string_to_regex(search_term: &String) -> Regex {
     let regex_search_term: String = if search_term.contains('*') {
         let replaced_search_term = search_term.replace(".", r"\.").replace("*", "(.*)");
         String::from("^") + replaced_search_term.as_str() + &String::from("$")
@@ -60,14 +60,13 @@ fn search_all_types(file: &DirEntry, regex: &Regex) {
 
 fn main() {
     let args: Search = Search::parse();
-    let empty_str: String = String::from("");
     let starting_dir: String = match args.starting_path {
         Some(x) => x,
         None => String::from("."),
     };
     let search_term: String = args.name; // Bound search by tearm by start and end
-    let search_type: String = args.search_type.unwrap_or(empty_str.clone());
-    let func: &dyn Fn(&DirEntry, &regex::Regex) -> () = match search_type.as_str() {
+    let search_type: &str = &args.search_type.unwrap_or("".to_string());
+    let func: &dyn Fn(&DirEntry, &regex::Regex) -> () = match search_type {
         "f" => &search_file,
         "d" => &search_dir,
         _ => &search_all_types,
@@ -76,8 +75,8 @@ fn main() {
         Some(x) => x,
         None => 3,
     };
-    let exclude_string = args.excluded_paths.unwrap_or(empty_str.clone());
-    let regex: Regex = string_to_regex(search_term);
+    let exclude_string: &str = &args.excluded_paths.unwrap_or("".to_string());
+    let regex: Regex = string_to_regex(&search_term);
     if exclude_string.is_empty() {
         for file in WalkDir::new(&starting_dir)
             .max_open(max_open)
