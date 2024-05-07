@@ -2,7 +2,7 @@ extern crate walkdir;
 
 use clap::Parser;
 use regex::Regex;
-use walkdir::WalkDir;
+use walkdir::{DirEntry, WalkDir};
 
 /// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
@@ -40,19 +40,19 @@ fn string_to_regex(search_term: String) -> Regex {
     return regex;
 }
 
-fn search_file(file: walkdir::DirEntry, regex: Regex) -> () {
+fn search_file(file: &DirEntry, regex: &Regex) -> () {
     if file.file_type().is_file() && regex.is_match(file.file_name().to_str().unwrap_or("")) {
         println!("{}", file.path().display());
     }
 }
 
-fn search_dir(file: walkdir::DirEntry, regex: Regex) -> () {
+fn search_dir(file: &DirEntry, regex: &Regex) -> () {
     if file.file_type().is_dir() && regex.is_match(file.file_name().to_str().unwrap_or("")) {
         println!("{}", file.path().display());
     }
 }
 
-fn search_all_types(file: walkdir::DirEntry, regex: Regex) {
+fn search_all_types(file: &DirEntry, regex: &Regex) {
     if regex.is_match(file.file_name().to_str().unwrap_or("")) {
         println!("{}", file.path().display());
     }
@@ -67,7 +67,7 @@ fn main() {
     };
     let search_term: String = args.name; // Bound search by tearm by start and end
     let search_type: String = args.search_type.unwrap_or(empty_str.clone());
-    let func: &dyn Fn(walkdir::DirEntry, regex::Regex) -> () = match search_type.as_str() {
+    let func: &dyn Fn(&DirEntry, &regex::Regex) -> () = match search_type.as_str() {
         "f" => &search_file,
         "d" => &search_dir,
         _ => &search_all_types,
@@ -84,7 +84,7 @@ fn main() {
             .into_iter()
             .filter_map(|file| file.ok())
         {
-            func(file, regex.clone());
+            func(&file, &regex);
         }
     } else {
         let exclude_list: Vec<&str> = exclude_string.split(",").collect::<Vec<&str>>();
@@ -101,7 +101,7 @@ fn main() {
             })
         {
             if file.is_ok() {
-                func(file.unwrap(), regex.clone());
+                func(&file.unwrap(), &regex);
             }
         }
     }
