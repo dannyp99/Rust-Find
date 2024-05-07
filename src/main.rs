@@ -28,12 +28,12 @@ struct Search {
     excluded_paths: Option<String>,
 }
 
-fn string_to_regex(search_term: &String) -> Regex {
+fn string_to_regex(search_term: &str) -> Regex {
     let regex_search_term: String = if search_term.contains('*') {
         let replaced_search_term = search_term.replace(".", r"\.").replace("*", "(.*)");
-        String::from("^") + replaced_search_term.as_str() + &String::from("$")
+        "^".to_owned() + replaced_search_term.as_str() + "$"
     } else {
-        String::from("^") + search_term.as_str() + &String::from("$")
+        "^".to_owned() + search_term + "$"
     };
     let regex = Regex::new(&regex_search_term).unwrap();
     //println!("Regex search term: {}", regex_search_term);
@@ -60,11 +60,8 @@ fn search_all_types(file: &DirEntry, regex: &Regex) {
 
 fn main() {
     let args: Search = Search::parse();
-    let starting_dir: String = match args.starting_path {
-        Some(x) => x,
-        None => String::from("."),
-    };
-    let search_term: String = args.name; // Bound search by tearm by start and end
+    let starting_dir: &str = &args.starting_path.unwrap_or(".".to_string());
+    let search_term: &str = &args.name; // Bound search by tearm by start and end
     let search_type: &str = &args.search_type.unwrap_or("".to_string());
     let func: &dyn Fn(&DirEntry, &regex::Regex) -> () = match search_type {
         "f" => &search_file,
