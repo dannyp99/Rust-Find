@@ -29,7 +29,7 @@ This expects one of two args: `--type f` or `type d` which will specify file or 
 
 ### --max-open
 
-This allows for multiple paths to be searched simultaniously at once. **The default value used is `1`**
+This allows for multiple paths to be searched simultaniously at once. **The default value used is `3`**
 Use this sparringly as the higher the number the more CPU power is used.
 
 ### --exclude
