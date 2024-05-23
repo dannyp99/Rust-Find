@@ -77,7 +77,8 @@ fn main() {
             .into_iter()
             .filter_entry(|entry| {
                 for exclude_item in &exclude_list {
-                    if entry.path().starts_with(exclude_item) {
+                    let match_item = WildMatch::new(&exclude_item);
+                    if match_item.matches(entry.path().to_str().unwrap_or_default()) {
                         return false;
                     }
                 }
