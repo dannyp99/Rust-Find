@@ -1,8 +1,10 @@
 extern crate walkdir;
 
+use std::collections::HashSet;
+
 use clap::Parser;
-use wildmatch::WildMatch;
 use walkdir::{DirEntry, WalkDir};
+use wildmatch::WildMatch;
 
 /// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
@@ -71,19 +73,11 @@ fn main() {
             func(&file, &wildcard);
         }
     } else {
-        let exclude_list: Vec<&str> = exclude_string.split(",").collect::<Vec<&str>>();
+        let exclusion_set: HashSet<&str> = exclude_string.split(",").collect::<HashSet<&str>>();
         for file in WalkDir::new(&starting_dir)
             .max_open(max_open)
             .into_iter()
-            .filter_entry(|entry| {
-                for exclude_item in &exclude_list {
-                    let match_item = WildMatch::new(&exclude_item);
-                    if match_item.matches(entry.path().to_str().unwrap_or_default()) {
-                        return false;
-                    }
-                }
-                return true;
-            })
+            .filter_entry(|entry| !exclusion_set.contains(entry.file_name().to_str().unwrap_or("")))
         {
             if file.is_ok() {
                 func(&file.unwrap(), &wildcard);
